@@ -676,6 +676,13 @@ build_codecpack() {
     # Copy package tree to staging, then overlay built binaries
     cp -a "$pkg_src/package/"* "$staging/package/"
 
+    # Recreate dirs that only hold build artifacts; git does not track
+    # empty directories, so they are absent after a fresh clone.
+    mkdir -p "$staging/package/pack/bin" \
+             "$staging/package/pack/lib/libva" \
+             "$staging/package/lib" \
+             "$staging/package/usr/lib"
+
     # Place binaries in pack/bin/ (matching official codec pack layout)
     cp "$ARCH_BUILD_DIR/ffmpeg"  "$staging/package/pack/bin/ffmpeg41"
     cp "$ARCH_BUILD_DIR/ffprobe" "$staging/package/pack/bin/ffprobe"
@@ -697,9 +704,8 @@ build_codecpack() {
     ln -sf ../pack/lib/ffmpeg41-for-synoface "$staging/package/lib/ffmpeg41-for-synoface"
     ln -sf ../pack/lib/libva "$staging/package/lib/libva"
 
-    # pack/lib/ targets for synoface and libva
+    # pack/lib/ target for synoface (libva dir created above)
     ln -sf ffmpeg41 "$staging/package/pack/lib/ffmpeg41-for-synoface"
-    mkdir -p "$staging/package/pack/lib/libva"
 
     # Update pack/INFO arch
     sed -i "s/^arch=.*/arch=\"${INFO_ARCH}\"/" "$staging/package/pack/INFO"
@@ -752,6 +758,11 @@ build_sve() {
 
     # Copy package tree to staging, then overlay built binaries
     cp -a "$pkg_src/package/"* "$staging/package/"
+
+    # Recreate dirs that only hold build artifacts; git does not track
+    # empty directories, so they are absent after a fresh clone.
+    mkdir -p "$staging/package/pack/lib/ffmpeg33-for-surveillance" \
+             "$staging/package/lib"
     chmod +x "$staging/package/bin/synocodectool"
     # SS loads ffmpeg shared libs from lib/ffmpeg33-for-surveillance/ which
     # we symlink to pack/lib/ffmpeg33-for-surveillance/.  Our static ffmpeg
