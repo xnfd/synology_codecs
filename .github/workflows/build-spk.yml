@@ -1,0 +1,32 @@
+name: 构建 Synology 编解码包
+on:
+  workflow_dispatch:
+    inputs:
+      arch:
+        description: 目标 NAS 架构
+        required: true
+        default: x86_64
+        type: choice
+        options:
+          - x86_64
+          - aarch64
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取源码
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: 执行构建脚本
+        run: |
+          chmod +x build.sh
+          ./build.sh --arch=${{ inputs.arch }}
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: spk-${{ inputs.arch }}
+          path: out/*.spk
