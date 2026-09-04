@@ -20,6 +20,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: 安装Python依赖
+        run: pip3 install pysodium msgpack
+
       - name: 执行构建脚本
         run: |
           chmod +x build.sh
